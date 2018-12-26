@@ -4,6 +4,8 @@
 Overload React component’s `defaultProps` using `.corianderc` file
 </h5>
 
+Works only with components exported by `export default` statement so far.
+
 ### Example .corianderc configuration file
 
 ```json
