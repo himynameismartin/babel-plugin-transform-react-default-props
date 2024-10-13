@@ -4,7 +4,7 @@
 Transform React component’s defaultProps
 </h5>
 
-### Example .corianderc configuration file
+### Quickstart
 
 ```js
   "plugins": [
@@ -24,6 +24,62 @@ Transform React component’s defaultProps
     }]
   ]
 ```
+
+### Motivation
+
+`babel-plugin-transform-react-default-props` is an easy and convenient way of overriding component's default props with your own without the need to re-export it.
+
+And it's a build-time transformation so it should save some bytes and nanoseconds (in theory 😅) when compared to run-time alternatives.
+
+### Example
+
+#### Input
+
+```js
+class ClassDeclarationComponentWithStaticClassProperty extends React.Component {
+  static defaultProps = {
+    propToBeChanged: "propToBeChanged",
+    propToRemainUnchanged: "propToRemainUnchanged",
+  };
+  render() {
+    return <div />;
+  }
+}
+```
+
+#### Babel Plugins Config
+
+```js
+  "plugins": [
+    ["../lib/index.js", {
+      "config": {
+        "ClassDeclarationComponentWithStaticClassProperty": {
+          "propToBeChanged": "changedProp",
+          "propToBeAdded": "addedProp"
+        }
+      }
+    }]
+  ]
+```
+
+#### Output
+
+```js
+class ClassDeclarationComponentWithStaticClassProperty extends React.Component {
+  static defaultProps = {
+    propToBeChanged: "changedProp",
+    propToRemainUnchanged: "propToRemainUnchanged",
+    propToBeAdded: "addedProp",
+  };
+  render() {
+    return <div />;
+  }
+}
+```
+
+### TODO
+
+`defaultProps` are deprecated for functional components and this plugin should transform default function parameters as well.
 
 ### License
 
