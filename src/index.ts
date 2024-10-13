@@ -1,58 +1,10 @@
 import { types, PluginObj } from '@babel/core';
-import * as parser from '@babel/parser';
-import type { NodePath, Scope } from '@babel/traverse';
-import * as React from 'react';
+import type { NodePath } from '@babel/traverse';
 
-type ReactLeaf = 
-  | React.ReactNode
-  | React.ComponentType<any>
-  | null
-  | undefined;
-
-type Props = {
-  [key: string]: ReactLeaf;
-}
-
-type Config = {
-  [key: string]: Props;
-}
-
-type Options = {
-  config?: Config;
-}
-
-type VisitorState = {
-  opts?: Options;
-}
+import type { ReactLeaf, Props, Config, VisitorState } from './types'
+import { getConfig, isIdentifierDeclared, parseCodeIntoAst } from './utils'
 
 export default ({ types: t }: { types: typeof types }): PluginObj => {
-  const getConfig = ({ state }: { state: VisitorState }): Config => state?.opts?.config || {};
-
-  const isIdentifierDeclared = ({ scope, name }: { scope: Scope, name: string }): boolean => {
-    return scope.hasBinding(name);
-  };
-
-  const parseCodeIntoAst = ({ value }: { value: Function }): types.Statement => {
-    const stringifiedValue = value.toString();
-
-    const { name } = value;
-
-    const componentCode = stringifiedValue.startsWith('function(') ? `const ${name} = ${stringifiedValue}` : stringifiedValue;
-
-    try {
-      const parsedAst = parser.parse(componentCode, {
-        sourceType: 'module',
-        plugins: ['jsx', 'classProperties'],
-      });
-
-      const astNode = parsedAst.program.body[0];
-
-      return astNode;
-    } catch {
-      throw new Error('Provided value is not parsable.');
-    }
-  }
-
   const insertCodeIntoAstAndReturnIdentifier = ({ value, visitorPath }: { value: ReactLeaf, visitorPath: NodePath }): types.Identifier | types.Expression => {
     if (t.isNode(value)) {
       if (t.isExpression(value)) {
