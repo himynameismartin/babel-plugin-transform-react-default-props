@@ -1,31 +1,28 @@
 <h1 align="center">babel-plugin-transform-react-default-props</h1>
 
 <h5 align="center">
-Overload React component’s `defaultProps` using `.corianderc` file
+Transform React component’s defaultProps
 </h5>
-
-Works only with components exported by `export default` statement so far.
 
 ### Example .corianderc configuration file
 
-```json
-{
-  "TextComponent": {
-    "color": "green",
-    "fontWeight": 500,
-    "marginBottom": null
-  },
-  "WrapperComponent": {
-    "display": "flex",
-    "flexGrow": 1
-  }
-}
-```
-
-### TODO
-
-```
-/* TODO */
+```js
+  "plugins": [
+    ["./lib/index.js", {
+      "config": {
+        "Icon": {
+          "width": 32,
+          "height": 32,
+          "color": "#dcdcdc"
+        },
+        "Input": {
+          "fontSize": 16,
+          "codes": ['+420', '+421'],
+          "Delete": DeleteLogo,
+        }
+      }
+    }]
+  ]
 ```
 
 ### License
