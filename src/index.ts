@@ -133,6 +133,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
   }
 
   return {
+    name: 'babel-plugin-transform-react-default-props',
     visitor: {
       ClassDeclaration(path: NodePath<types.ClassDeclaration>, state: VisitorState) {
         const config = getConfig({ state });
