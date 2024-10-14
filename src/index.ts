@@ -26,14 +26,16 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
       if (!isIdentifierDeclared({ scope, name })) {
         let nodeToBeInserted = null;
         
-        if (t.isFunctionDeclaration(componentAst) || t.isClassDeclaration(componentAst)) {
+        if (
+          t.isFunctionDeclaration(componentAst) ||
+          t.isClassDeclaration(componentAst) ||
+          t.isVariableDeclaration(componentAst)
+        ) {
           nodeToBeInserted = componentAst;
         } else if (t.isExpressionStatement(componentAst)) {
           nodeToBeInserted = t.variableDeclaration('const', [
             t.variableDeclarator(t.identifier(name), componentAst.expression)
           ]);
-        } else if (t.isVariableDeclaration(componentAst)) {
-          nodeToBeInserted = componentAst;
         }
 
         if (nodeToBeInserted && visitorPath.parentPath) {
