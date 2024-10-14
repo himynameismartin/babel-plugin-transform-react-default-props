@@ -6,23 +6,40 @@ Transform React component’s defaultProps
 
 ### Quickstart
 
+```console
+yarn
+yarn build
+```
+
+**babel.config.js**
 ```js
-  "plugins": [
-    ["./lib/index.js", {
-      "config": {
-        "Icon": {
-          "width": 32,
-          "height": 32,
-          "color": "#dcdcdc"
-        },
-        "Input": {
-          "fontSize": 16,
-          "codes": ['+420', '+421'],
-          "Delete": DeleteLogo,
+const React = require('react');
+
+const DeleteLogo = () => {
+  return React.createElement('div', null, '✕');
+};
+
+
+module.exports = function () {
+  return {
+    "plugins": [
+      ["./lib/index.js", {
+        "config": {
+          "Icon": {
+            "width": 32,
+            "height": 32,
+            "color": "#dcdcdc"
+          },
+          "Input": {
+            "fontSize": 16,
+            "codes": ["+420", "+421"],
+            "Delete": DeleteLogo
+          }
         }
-      }
-    }]
-  ]
+      }]
+    ]
+  }
+};
 ```
 
 ### Motivation
