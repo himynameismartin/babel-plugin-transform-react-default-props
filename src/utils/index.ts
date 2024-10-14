@@ -14,7 +14,9 @@ export const parseCodeIntoAst = ({ value }: { value: Function }): types.Statemen
 
   const { name } = value;
 
-  const componentCode = stringifiedValue.startsWith('function(') ? `const ${name} = ${stringifiedValue}` : stringifiedValue;
+  const componentCode = stringifiedValue.startsWith('function(') ?
+    `const ${name} = ${stringifiedValue}`
+    : stringifiedValue;
 
   try {
     const parsedAst = parser.parse(componentCode, {

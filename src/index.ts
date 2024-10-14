@@ -5,12 +5,15 @@ import type { ReactLeaf, Props, Config, VisitorState } from './types'
 import { getConfig, isIdentifierDeclared, parseCodeIntoAst } from './utils'
 
 export default ({ types: t }: { types: typeof types }): PluginObj => {
-  const insertCodeIntoAstAndReturnIdentifier = ({ value, visitorPath }: { value: ReactLeaf, visitorPath: NodePath }): types.Identifier | types.Expression => {
+  const insertCodeIntoAstAndReturnIdentifier = ({
+    value,
+    visitorPath,
+  }: { value: ReactLeaf, visitorPath: NodePath }): types.Identifier | types.Expression => {
     if (t.isNode(value)) {
       if (t.isExpression(value)) {
         return value;
       } else {
-        throw new Error('Provided value is not an expression.');
+        throw new Error('Provided value node is not an expression.');
       }
     }
   
@@ -54,9 +57,15 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
   }
 
 
-  const mapPropsToObjectProperties = ({ props, visitorPath }: { props: Props, visitorPath: NodePath }): types.ObjectProperty[] => {
+  const mapPropsToObjectProperties = ({
+    props,
+    visitorPath,
+  }: { props: Props, visitorPath: NodePath }): types.ObjectProperty[] => {
     return Object.keys(props).map((key) => {
-      return t.objectProperty(t.identifier(key), insertCodeIntoAstAndReturnIdentifier({ value: props[key], visitorPath }))
+      return t.objectProperty(
+        t.identifier(key),
+        insertCodeIntoAstAndReturnIdentifier({ value: props[key], visitorPath })
+      )
     });
   }
 
@@ -68,7 +77,11 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
         if (
           t.isObjectProperty(prop) &&
           t.isIdentifier(prop.key) &&
-          (types.isStringLiteral(prop.value) || types.isNumericLiteral(prop.value) || types.isBooleanLiteral(prop.value))
+          (
+            types.isStringLiteral(prop.value) ||
+            types.isNumericLiteral(prop.value) ||
+            types.isBooleanLiteral(prop.value)
+          )
         ) {
           existingProps[prop.key.name] = prop.value.value;
         }
@@ -81,14 +94,22 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
     }
   }
 
-  const buildDefaultPropsObjectExpression = ({ props, visitorPath }: { props: Props, visitorPath: NodePath }): types.ObjectExpression => {
+  const buildDefaultPropsObjectExpression = ({
+    props,
+    visitorPath,
+  }: { props: Props, visitorPath: NodePath }): types.ObjectExpression => {
     return t.objectExpression(
       mapPropsToObjectProperties({ props, visitorPath })
     );
   }
 
   const handleFunctionComponent = ({ path, componentName, config }: {
-    path: NodePath<types.FunctionDeclaration | types.FunctionExpression | types.ArrowFunctionExpression | types.VariableDeclaration>,
+    path: NodePath<
+      types.FunctionDeclaration |
+      types.FunctionExpression |
+      types.ArrowFunctionExpression |
+      types.VariableDeclaration
+    >,
     componentName: string,
     config: Config,
   }) => {
@@ -109,7 +130,11 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
 
           if (isDefaultProps) {
             hasDefaultProps = true;
-            modifyExistingDefaultProps({ value: assignmentPath.node.right, props: config[componentName], visitorPath: path })
+            modifyExistingDefaultProps({
+              value: assignmentPath.node.right,
+              props: config[componentName],
+              visitorPath: path,
+            })
             assignmentPath.stop();
           }
         }
@@ -150,14 +175,21 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
               node.value !== undefined
             ) {
               hasStaticDefaultProps = true;
-              modifyExistingDefaultProps({ value: node.value, props: config[componentName], visitorPath: path })
+              modifyExistingDefaultProps({
+                value: node.value,
+                props: config[componentName],
+                visitorPath: path,
+              })
             }
           });
 
           if (!hasStaticDefaultProps) {
             const defaultPropsNode = t.classProperty(
               t.identifier('defaultProps'),
-              buildDefaultPropsObjectExpression({ props: config[componentName], visitorPath: path })
+              buildDefaultPropsObjectExpression({
+                props: config[componentName],
+                visitorPath: path,
+              })
             );
             defaultPropsNode.static = true;
 
@@ -181,8 +213,10 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
 
       ArrowFunctionExpression(path: NodePath<types.ArrowFunctionExpression>, state: VisitorState) {
         const config = getConfig({ state });
-        if (path.parent.type === 'VariableDeclarator' && t.isIdentifier(path.parent.id)) {
-          const componentName = path.parent.id.name;
+        const { parent } = path;
+        
+        if (t.isVariableDeclarator(parent) && t.isIdentifier(parent.id)) {
+          const componentName = parent.id.name;
 
           if (config[componentName]) {
             handleFunctionComponent({
