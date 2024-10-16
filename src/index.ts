@@ -1,6 +1,7 @@
 import { types, PluginObj } from '@babel/core';
 import type { NodePath } from '@babel/traverse';
 
+import { BABEL_PLUGIN_NAME } from './constants';
 import type { ReactLeaf, Props, Config, VisitorState } from './types';
 import { getConfig, isIdentifierDeclared, parseCodeIntoAst } from './utils';
 
@@ -66,9 +67,9 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
       return t.objectProperty(
         t.identifier(key),
         insertCodeIntoAstAndReturnIdentifier({ value: props[key], visitorPath })
-      );
+      )
     });
-  };
+  }
 
   const modifyExistingDefaultProps = (
     { value, props, visitorPath }: { value: types.Expression | null, props: Props, visitorPath: NodePath }
@@ -93,7 +94,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
       const mergedProps = { ...existingProps, ...props };
       value.properties = mapPropsToObjectProperties({ props: mergedProps, visitorPath });
     }
-  };
+  }
 
   const buildDefaultPropsObjectExpression = ({
     props,
@@ -102,7 +103,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
     return t.objectExpression(
       mapPropsToObjectProperties({ props, visitorPath })
     );
-  };
+  }
 
   const handleFunctionComponent = ({ path, componentName, config }: {
     path: NodePath<
@@ -117,7 +118,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
     let hasDefaultProps = false;
     const programPath = path.findParent((parentPath: NodePath) =>
       parentPath.isProgram()
-    );
+    )
     
     if (programPath) {
       programPath.traverse({
@@ -140,7 +141,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
           }
         }
       });
-    }
+    };
 
     if (!hasDefaultProps) {
       const newProps = config[componentName];
@@ -156,10 +157,10 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
         )
       );
     }
-  };
+  }
 
   return {
-    name: 'babel-plugin-transform-react-default-props',
+    name: BABEL_PLUGIN_NAME,
     visitor: {
       ClassDeclaration(path: NodePath<types.ClassDeclaration>, state: VisitorState) {
         const config = getConfig({ state });
@@ -180,7 +181,7 @@ export default ({ types: t }: { types: typeof types }): PluginObj => {
                 value: node.value,
                 props: config[componentName],
                 visitorPath: path,
-              });
+              })
             }
           });
 
