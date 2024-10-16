@@ -12,8 +12,8 @@ export type Config = Record<string, Props>;
 
 export type Options = {
   config?: Config;
-}
+};
 
 export type VisitorState = {
   opts?: Options;
-}
+};

@@ -1,7 +1,7 @@
 import { types } from '@babel/core';
 import * as parser from '@babel/parser';
 import type { Scope } from '@babel/traverse';
-import type { Config, VisitorState } from '../types'
+import type { Config, VisitorState } from '../types';
 
 export const getConfig = ({ state }: { state: VisitorState }): Config => state?.opts?.config || {};
 
@@ -30,4 +30,4 @@ export const parseCodeIntoAst = ({ value }: { value: Function }): types.Statemen
   } catch {
     throw new Error('Provided value is not parsable.');
   }
-}
+};
