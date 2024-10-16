@@ -6,13 +6,9 @@ export type ReactLeaf =
   | null
   | undefined;
 
-export type Props = {
-  [key: string]: ReactLeaf;
-}
+export type Props = Record<string, ReactLeaf>;
 
-export type Config = {
-  [key: string]: Props;
-}
+export type Config = Record<string, Props>;
 
 export type Options = {
   config?: Config;
